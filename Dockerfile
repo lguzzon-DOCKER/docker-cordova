@@ -21,6 +21,7 @@ LABEL maintainer="Luca Guzzon <luca.guzzon@gmail.com>" \
     org.label-schema.url="https://github.com/lguzzon-DOCKER/docker-cordova"
 
 # Start  Base 
+# Start  Base 
 ENV DEBIAN_FRONTEND noninteractive
 ENV uAptGet "apt-get -y -qq -o Dpkg::Options::=--force-all"
 ENV uApt "${uAptGet}"
@@ -29,17 +30,13 @@ ENV aptPurge "${uApt} purge"
 ENV aptAutoremove "${uApt} autoremove"
 ENV aptClean "${uApt} clean && ${uApt} autoclean"
 ENV aptUpdate "${aptAutoremove} && ${uApt} --fix-missing update"
-#ENV filterEnd " 2>&1 | awk 'NR % 5 == 1'"
 ENV nullEnd " >/dev/null 2>&1"
-ENV filterEnd " >/dev/null 2>&1"
-
 ENV TERM xterm
 # Finish Base
 
 # Start  Android
 ENV ANDROID_HOME "/opt/android"
 ENV ANDROID_SDK_URL "https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip"
-
 ENV PATH ${PATH}:${ANDROID_HOME}/tools:${ANDROID_HOME}/tools/bin:${ANDROID_HOME}/platform-tools
 # Finish Android
 
@@ -52,34 +49,32 @@ ENV CORDOVA_VERSION latest
 ENV IONIC_VERSION latest
 # Finish Cordova
 
-RUN echo "${uApt}"
-
 RUN set -x \
-    # ------------------------------------------------------
-    # Start  Android
-    && eval "dpkg --add-architecture i386 ${filterEnd}" \
-    # Finish Android
+# ------------------------------------------------------
+# Start  Android
+    && eval "dpkg --add-architecture i386 ${nullEnd}" \
+# Finish Android
     && eval "${aptUpdate}" \
-    # ------------------------------------------------------
-    # Start  Java 
-    && eval "${aptInstall} apt-utils software-properties-common ${filterEnd}"
-RUN eval "add-apt-repository ppa:openjdk-r/ppa -y ${filterEnd}"
-RUN eval "${aptUpdate}"
-RUN eval "${aptInstall} openjdk-8-jdk ${filterEnd}"
-RUN java -version
-    # Finish Java
-    # ------------------------------------------------------
-    # Start  Android
-RUN eval "${aptInstall} ant curl libc6:i386 libgcc1:i386 libncurses5:i386 libstdc++6:i386 libz1:i386 net-tools zlib1g:i386 wget unzip ${filterEnd}"
-RUN mkdir -p /opt
-RUN wget -q "${ANDROID_SDK_URL}" -O android-sdk-tools.zip
-RUN eval "unzip -q android-sdk-tools.zip -d ${ANDROID_HOME} ${filterEnd}"
-RUN rm android-sdk-tools.zip
-RUN eval "(yes | sdkmanager --licenses) ${nullEnd}"
-RUN touch /root/.android/repositories.cfg
-RUN eval "sdkmanager emulator tools platform-tools ${filterEnd}"
-RUN eval "(yes | sdkmanager --update --channel=3)  ${filterEnd}"
-RUN yes | sdkmanager \
+# ------------------------------------------------------
+# Start  Java 
+    && eval "${aptInstall} apt-utils software-properties-common ${nullEnd}" \
+    && eval "add-apt-repository ppa:openjdk-r/ppa -y ${nullEnd}" \
+    && eval "${aptUpdate}" \
+    && eval "${aptInstall} openjdk-8-jdk ${nullEnd}" \
+    && java -version \
+# Finish Java
+# ------------------------------------------------------
+# Start  Android
+	&& eval "${aptInstall} ant curl libc6:i386 libgcc1:i386 libncurses5:i386 libstdc++6:i386 libz1:i386 net-tools zlib1g:i386 wget unzip ${nullEnd}" \
+	&& mkdir -p /opt \
+	&& wget -q "${ANDROID_SDK_URL}" -O android-sdk-tools.zip \
+	&& eval "unzip -q android-sdk-tools.zip -d ${ANDROID_HOME} ${nullEnd}" \
+	&& rm android-sdk-tools.zip \
+	&& eval "(yes | sdkmanager --licenses) ${nullEnd}" \
+	&& touch /root/.android/repositories.cfg \
+	&& eval "sdkmanager emulator tools platform-tools ${nullEnd}" \
+	&& eval "(yes | sdkmanager --update --channel=3)  ${nullEnd}" \
+	&& yes | sdkmanager \
         "platforms;android-29" \
         #"platforms;android-28" \
         #"platforms;android-27" \
@@ -128,38 +123,38 @@ RUN yes | sdkmanager \
         #"add-ons;addon-google_apis-google-23" \
         #"add-ons;addon-google_apis-google-22" \
         #"add-ons;addon-google_apis-google-21" \
-        >/dev/null 2>&1
-    # ------------------------------------------------------
-    # Gradle 
-RUN eval "${aptInstall} gradle ${filterEnd}"
-RUN gradle --version \
-    # ------------------------------------------------------
-    #Maven
-    && eval "${aptPurge} maven maven2"
-RUN eval "${aptInstall} maven ${filterEnd}"
-RUN mvn --version \
-    # Finish Android
-    # ------------------------------------------------------
-    # Start  NodeJS
-    && eval "${aptInstall} curl git ca-certificates ${filterEnd}"
-RUN mkdir -p /opt/node
-RUN (cd /opt/node \
-        && curl -sSL https://nodejs.org/dist/latest/ | grep "node-" | head -1 | sed -e 's/^[^-]*-\([^-]*\)-.*/\1/' > /tmp/nodejsVersion \
-        && curl -sSL https://nodejs.org/dist/$(cat /tmp/nodejsVersion)/node-$(cat /tmp/nodejsVersion)-linux-x64.tar.gz | tar xz --strip-components=1)
-RUN node --version
-RUN npm --version \
-    # Finish NodeJS
-    # ------------------------------------------------------
-    # Start Cordova
-    && (cd /tmp \
-        && npm i -g --unsafe-perm "cordova@${CORDOVA_VERSION}" "@ionic/cli@${IONIC_VERSION}" "framework7-cli")
-RUN cordova --version
-RUN cordova telemetry off
-RUN ionic --version
-RUN framework7 --version
-    # Finish Cordova
-    # ------------------------------------------------------
-    # Clean up
-RUN rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
-    && eval "${aptAutoremove}" \
-    && eval "${aptClean}" 
+        >/dev/null 2>&1 \
+# ------------------------------------------------------
+# Gradle 
+		&& eval "${aptInstall} gradle ${nullEnd}" \
+		&& gradle --version \
+# ------------------------------------------------------
+#Maven
+	    && eval "${aptPurge} maven maven2" \
+	    && eval "${aptInstall} maven ${nullEnd}" \
+	    && mvn --version \
+# Finish Android
+# ------------------------------------------------------
+# Start  NodeJS
+	    && eval "${aptInstall} curl git ca-certificates ${nullEnd}" \
+	    && mkdir -p /opt/node \
+	    && (cd /opt/node \
+	        && curl -sSL https://nodejs.org/dist/latest/ | grep "node-" | head -1 | sed -e 's/^[^-]*-\([^-]*\)-.*/\1/' > /tmp/nodejsVersion \
+	        && curl -sSL https://nodejs.org/dist/$(cat /tmp/nodejsVersion)/node-$(cat /tmp/nodejsVersion)-linux-x64.tar.gz | tar xz --strip-components=1) \
+	        && node --version \
+	        && npm --version \
+# Finish NodeJS
+# ------------------------------------------------------
+# Start Cordova Ionic Framework7
+	    && (cd /tmp \
+	        && npm i -g --unsafe-perm "cordova@${CORDOVA_VERSION}" "@ionic/cli@${IONIC_VERSION}" "framework7-cli@${FRAMEWORK_SEVEN_VERSION}") \
+	        && cordova --version \
+	        && cordova telemetry off \
+	        && ionic --version \
+	        && framework7 --version \
+# Finish Cordova
+# ------------------------------------------------------
+# Clean up
+	    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
+	    && eval "${aptAutoremove}" \
+	    && eval "${aptClean}" 
