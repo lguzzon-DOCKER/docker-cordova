@@ -33,20 +33,11 @@ ENV TERM xterm
 # Finish Base
 
     # Start  Android
-ENV ANDROID_SDK_URL "https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip"
-ENV ANDROID_BUILD_TOOLS_VERSION 27.0.0
-ENV ANDROID_APIS "android-10,android-15,android-16,android-17,android-18,android-19,android-20,android-21,android-22,android-23,android-24,android-25,android-26"
-ENV ANT_HOME "/usr/share/ant"
-ENV MAVEN_HOME "/usr/share/maven"
-ENV GRADLE_HOME "/usr/share/gradle"
 ENV ANDROID_HOME "/opt/android"
+ENV ANDROID_SDK_URL "https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip"
 
-ENV PATH $PATH:$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools:$ANDROID_HOME/build-tools/$ANDROID_BUILD_TOOLS_VERSION:$ANT_HOME/bin:$MAVEN_HOME/bin:$GRADLE_HOME/bin \
+ENV PATH ${PATH}:${ANDROID_HOME}/tools:${ANDROID_HOME}/tools/bin:${ANDROID_HOME}/platform-tools
     # Finish Android
-
-    # Start  Java 
-ENV JAVA_HOME /usr/lib/jvm/java-11-openjdk-amd64
-    # Finish Java
 
     # Start  NodeJS
 ENV PATH $PATH:/opt/node/bin
@@ -54,6 +45,7 @@ ENV PATH $PATH:/opt/node/bin
 
     # Start Cordova
 ENV CORDOVA_VERSION latest
+ENV IONIC_VERSION latest
     # Finish Cordova
 
 RUN echo "${uApt}"
@@ -68,26 +60,89 @@ RUN set -x \
     && eval "${aptInstall} software-properties-common" \ 
     && add-apt-repository ppa:openjdk-r/ppa -y \
     && eval "${aptUpdate}" \ 
-    && eval "${aptInstall} openjdk-11-jdk" \
+    && eval "${aptInstall} openjdk-8-jdk" \
     && java -version
     # Finish Java
 
     # Start  Android
-RUN eval "${aptInstall} wget curl maven ant gradle libncurses5:i386 libstdc++6:i386 zlib1g:i386" \
+RUN eval "${aptInstall} ant curl libc6:i386 libgcc1:i386 libncurses5:i386 libstdc++6:i386 libz1:i386 net-tools zlib1g:i386 wget unzip" \
     && mkdir -p /opt \
-    && (cd /opt \
-        && mkdir android \
-        && cd android \
-        && wget -O tools.zip ${ANDROID_SDK_URL} \
-        && unzip tools.zip \
-        && rm tools.zip \
-        && echo y | android update sdk -a -u -t platform-tools,${ANDROID_APIS},build-tools-${ANDROID_BUILD_TOOLS_VERSION} \
-        && chmod a+x -R $ANDROID_HOME \
-        && chown -R root:root $ANDROID_HOME) \
+
+# ------------------------------------------------------
+# --- Download Android SDK tools into $ANDROID_HOME
+
+    && wget -q "${ANDROID_SDK_URL}" -O android-sdk-tools.zip \
+    && unzip -q android-sdk-tools.zip -d "${ANDROID_HOME}" \
+    && rm android-sdk-tools.zip \
+        
+    && yes | sdkmanager --licenses \
+
+    && touch /root/.android/repositories.cfg \
+
+    && sdkmanager "emulator" "tools" "platform-tools" \
+
+    && yes | sdkmanager --update --channel=3 \
+    && yes | sdkmanager \
+        "platforms;android-29" \
+        "platforms;android-28" \
+        "platforms;android-27" \
+        "platforms;android-26" \
+        "platforms;android-25" \
+        "platforms;android-24" \
+        "platforms;android-23" \
+        "platforms;android-22" \
+        "platforms;android-21" \
+        "platforms;android-19" \
+        "platforms;android-17" \
+        "platforms;android-15" \
+        "build-tools;29.0.2" \
+        "build-tools;29.0.1" \
+        "build-tools;29.0.0" \
+        "build-tools;28.0.3" \
+        "build-tools;28.0.2" \
+        "build-tools;28.0.1" \
+        "build-tools;28.0.0" \
+        "build-tools;27.0.3" \
+        "build-tools;27.0.2" \
+        "build-tools;27.0.1" \
+        "build-tools;27.0.0" \
+        "build-tools;26.0.2" \
+        "build-tools;26.0.1" \
+        "build-tools;25.0.3" \
+        "build-tools;24.0.3" \
+        "build-tools;23.0.3" \
+        "build-tools;22.0.1" \
+        "build-tools;21.1.2" \
+        "build-tools;19.1.0" \
+        "build-tools;17.0.0" \
+        "system-images;android-29;google_apis;x86" \
+        "system-images;android-28;google_apis;x86" \
+        "system-images;android-26;google_apis;x86" \
+        "system-images;android-25;google_apis;armeabi-v7a" \
+        "system-images;android-24;default;armeabi-v7a" \
+        "system-images;android-22;default;armeabi-v7a" \
+        "system-images;android-19;default;armeabi-v7a" \
+        "extras;android;m2repository" \
+        "extras;google;m2repository" \
+        "extras;google;google_play_services" \
+        "extras;m2repository;com;android;support;constraint;constraint-layout;1.0.2" \
+        "extras;m2repository;com;android;support;constraint;constraint-layout;1.0.1" \
+        "add-ons;addon-google_apis-google-23" \
+        "add-ons;addon-google_apis-google-22" \
+        "add-ons;addon-google_apis-google-21" \
+
+    # Gradle 
+    && eval "${aptInstall} gradle" \ 
+    && gradle --version \
+
+    #Maven
+    && eval "${aptPurge} maven maven2" \ 
+    && eval "${aptInstall} maven" \ 
+    && mvn --version \
     # Finish Android
     
     # Start  NodeJS
-RUN eval "${aptInstall} curl git ca-certificates" \
+    && eval "${aptInstall} curl git ca-certificates" \
     && mkdir -p /opt/node \
     && (cd /opt/node \
         && curl -sSL https://nodejs.org/dist/latest/ | grep "node-" | head -1 | sed -e 's/^[^-]*-\([^-]*\)-.*/\1/' > /tmp/nodejsVersion \
@@ -98,7 +153,9 @@ RUN eval "${aptInstall} curl git ca-certificates" \
     
     # Start Cordova
     && (cd /tmp \
-        && npm i -g --unsafe-perm cordova@${CORDOVA_VERSION}) \
+        && npm i -g --unsafe-perm "cordova@${CORDOVA_VERSION}" "ionic@${IONIC_VERSION}") 
+    && cordova --version \
+    && ionic --version \
     # Finish Cordova
     
     # Clean up
