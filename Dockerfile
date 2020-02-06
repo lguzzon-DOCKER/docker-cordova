@@ -58,15 +58,18 @@ RUN set -x \
     && eval "${aptUpdate}" \
     # ------------------------------------------------------
     # Start  Java 
-    && eval "${aptInstall} software-properties-common" \
+    && eval "${aptInstall} apt-utils software-properties-common" \
+        >/dev/null 2>&1 \ 
     && add-apt-repository ppa:openjdk-r/ppa -y \
     && eval "${aptUpdate}" \
     && eval "${aptInstall} openjdk-8-jdk" \
+        >/dev/null 2>&1 \ 
     && java -version
     # Finish Java
     # ------------------------------------------------------
     # Start  Android
 RUN eval "${aptInstall} ant curl libc6:i386 libgcc1:i386 libncurses5:i386 libstdc++6:i386 libz1:i386 net-tools zlib1g:i386 wget unzip" \
+        >/dev/null 2>&1 \ 
     && mkdir -p /opt \
     && wget -q "${ANDROID_SDK_URL}" -O android-sdk-tools.zip \
     && unzip -q android-sdk-tools.zip -d "${ANDROID_HOME}" \
