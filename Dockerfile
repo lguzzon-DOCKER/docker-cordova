@@ -95,5 +95,6 @@ ENV CORDOVA_VERSION=latest
 
 WORKDIR "/tmp"
 
-RUN npm i -g --unsafe-perm cordova@${CORDOVA_VERSION}
+RUN npm install -g --unsafe-perm)true cordova@${CORDOVA_VERSION}
+RUN npm install -g --unsafe-perm=true framework7-cli
 # Finish Cordova
