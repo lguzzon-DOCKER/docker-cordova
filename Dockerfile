@@ -29,8 +29,9 @@ ENV aptPurge "${uApt} purge"
 ENV aptAutoremove "${uApt} autoremove"
 ENV aptClean "${uApt} clean && ${uApt} autoclean"
 ENV aptUpdate "${aptAutoremove} && ${uApt} --fix-missing update"
-ENV filterEnd " 2>&1 | awk 'NR % 5 == 1'"
+#ENV filterEnd " 2>&1 | awk 'NR % 5 == 1'"
 ENV nullEnd " >/dev/null 2>&1"
+ENV filterEnd " >/dev/null 2>&1"
 
 ENV TERM xterm
 # Finish Base
