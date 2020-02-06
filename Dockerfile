@@ -128,7 +128,7 @@ RUN yes | sdkmanager \
         #"add-ons;addon-google_apis-google-23" \
         #"add-ons;addon-google_apis-google-22" \
         #"add-ons;addon-google_apis-google-21" \
-        2>&1 | awk 'NR % 15 == 1'
+        >/dev/null 2>&1
     # ------------------------------------------------------
     # Gradle 
 RUN eval "${aptInstall} gradle ${filterEnd}"
