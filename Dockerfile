@@ -74,7 +74,7 @@ RUN mkdir -p /opt
 RUN wget -q "${ANDROID_SDK_URL}" -O android-sdk-tools.zip
 RUN eval "unzip -q android-sdk-tools.zip -d ${ANDROID_HOME} ${filterEnd}"
 RUN rm android-sdk-tools.zip
-RUN eval "(yes | sdkmanager --licenses) ${filterEnd}"
+RUN eval "(yes | sdkmanager --licenses) ${nullEnd}"
 RUN touch /root/.android/repositories.cfg
 RUN eval "sdkmanager emulator tools platform-tools ${filterEnd}"
 RUN eval "(yes | sdkmanager --update --channel=3)  ${filterEnd}"
@@ -125,7 +125,7 @@ RUN yes | sdkmanager \
         "extras;m2repository;com;android;support;constraint;constraint-layout;1.0.1" \
         "add-ons;addon-google_apis-google-23" \
         "add-ons;addon-google_apis-google-22" \
-        "add-ons;addon-google_apis-google-21"
+        "add-ons;addon-google_apis-google-21" 2>&1 | awk 'NR % 15 == 1'
     # ------------------------------------------------------
     # Gradle 
 RUN eval "${aptInstall} gradle ${filterEnd}"
