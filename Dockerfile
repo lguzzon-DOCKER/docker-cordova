@@ -57,9 +57,9 @@ RUN set -x \
     && eval "${aptUpdate}" \
     
     # Start  Java 
-    && eval "${aptInstall} software-properties-common" \ 
+    && eval "${aptInstall} software-properties-common" \
     && add-apt-repository ppa:openjdk-r/ppa -y \
-    && eval "${aptUpdate}" \ 
+    && eval "${aptUpdate}" \
     && eval "${aptInstall} openjdk-8-jdk" \
     && java -version
     # Finish Java
@@ -132,12 +132,12 @@ RUN eval "${aptInstall} ant curl libc6:i386 libgcc1:i386 libncurses5:i386 libstd
         "add-ons;addon-google_apis-google-21" \
 
     # Gradle 
-    && eval "${aptInstall} gradle" \ 
+    && eval "${aptInstall} gradle" \
     && gradle --version \
 
     #Maven
-    && eval "${aptPurge} maven maven2" \ 
-    && eval "${aptInstall} maven" \ 
+    && eval "${aptPurge} maven maven2" \
+    && eval "${aptInstall} maven" \
     && mvn --version \
     # Finish Android
     
@@ -153,12 +153,12 @@ RUN eval "${aptInstall} ant curl libc6:i386 libgcc1:i386 libncurses5:i386 libstd
     
     # Start Cordova
     && (cd /tmp \
-        && npm i -g --unsafe-perm "cordova@${CORDOVA_VERSION}" "ionic@${IONIC_VERSION}") 
+        && npm i -g --unsafe-perm "cordova@${CORDOVA_VERSION}" "ionic@${IONIC_VERSION}") \
     && cordova --version \
     && ionic --version \
     # Finish Cordova
     
     # Clean up
     &&  rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
-    && eval "${aptAutoremove}" \ 
+    && eval "${aptAutoremove}" \
     && eval "${aptClean}" 
