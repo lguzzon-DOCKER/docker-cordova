@@ -152,10 +152,11 @@ RUN npm --version \
     # ------------------------------------------------------
     # Start Cordova
     && (cd /tmp \
-        && npm i -g --unsafe-perm "cordova@${CORDOVA_VERSION}" "ionic@${IONIC_VERSION}")
+        && npm i -g --unsafe-perm "cordova@${CORDOVA_VERSION}" "@ionic/cli@${IONIC_VERSION}" "framework7-cli")
 RUN cordova --version
-RUN ionic --version
 RUN cordova telemetry off
+RUN ionic --version
+RUN framework7 --version
     # Finish Cordova
     # ------------------------------------------------------
     # Clean up
