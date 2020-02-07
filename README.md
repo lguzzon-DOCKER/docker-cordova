@@ -1,29 +1,23 @@
-[![Travis](https://shields.beevelop.com/travis/lguzzon-DOCKER/docker-cordova.svg?style=flat-square)](https://travis-ci.org/lguzzon-DOCKER/docker-cordova)
-[![Pulls](https://shields.beevelop.com/docker/pulls/lguzzon/cordova.svg?style=flat-square)](https://links.beevelop.com/d-cordova)
-[![Layers](https://shields.beevelop.com/docker/image/layers/lguzzon/cordova/latest.svg?style=flat-square)](https://links.beevelop.com/d-cordova)
-[![Size](https://shields.beevelop.com/docker/image/size/lguzzon/cordova/latest.svg?style=flat-square)](https://links.beevelop.com/d-cordova)
-[![GitHub release](https://shields.beevelop.com/github/release/lguzzon-DOCKER/docker-cordova.svg?style=flat-square)](https://github.com/lguzzon-DOCKER/docker-cordova/releases)
-![Badges](https://shields.beevelop.com/badge/badges-7-brightgreen.svg?style=flat-square)
-[![Beevelop](https://links.beevelop.com/honey-badge)](https://beevelop.com)
-
-# Latest Cordova
+[![Travis (.org) branch](https://img.shields.io/travis/lguzzon-DOCKER/docker-cordova/master)](https://travis-ci.org/lguzzon-DOCKER/docker-cordova)
+[![Docker Pulls](https://img.shields.io/docker/pulls/lguzzon/docker-cordova)](https://hub.docker.com/repository/docker/lguzzon/docker-cordova)
+# Latest docker-cordova
 ----
 ### Pull from Docker Hub
 ```
-docker pull lguzzon/cordova:latest
+docker pull lguzzon/docker-cordova:latest
 ```
 
 ### Or build from GitHub
 ```
-docker build -t lguzzon/cordova github.com/beevelop/docker-java
+docker build -t lguzzon/docker-cordova github.com/lguzzon-DOCKER/docker-cordova
 ```
 
 ### Run image
 ```
-docker run -it lguzzon/cordova bash
+docker run -it lguzzon/docker-cordova bash
 ```
 
 ### Or use as base image
 ```Dockerfile
-FROM lguzzon/cordova:latest
+FROM lguzzon/docker-cordova:latest
 ```
