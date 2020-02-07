@@ -21,7 +21,6 @@ LABEL maintainer="Luca Guzzon <luca.guzzon@gmail.com>" \
     org.label-schema.url="https://github.com/lguzzon-DOCKER/docker-cordova"
 
 # Start  Base 
-# Start  Base 
 ENV DEBIAN_FRONTEND noninteractive
 ENV uAptGet "apt-get -y -qq -o Dpkg::Options::=--force-all"
 ENV uApt "${uAptGet}"
@@ -47,25 +46,49 @@ ENV PATH $PATH:/opt/node/bin
 # Start Cordova
 ENV CORDOVA_VERSION latest
 ENV IONIC_VERSION latest
+ENV FRAMEWORK_SEVEN_VERSION latest
 # Finish Cordova
 
-RUN set -x \
+# Use this to truncate long RUN s
+# # \/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/
+#     && true
+# RUN    set -x \
+#     && source "$HOME/.sdkman/bin/sdkman-init.sh" \
+# # /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
+
 # ------------------------------------------------------
-# Start  Android
+# PRE-REQUISITES 
+RUN    rm /bin/sh && ln -s /bin/bash /bin/sh
+# RUN    set -x \
+RUN    true \
     && eval "dpkg --add-architecture i386 ${nullEnd}" \
-# Finish Android
     && eval "${aptUpdate}" \
 # ------------------------------------------------------
-# Start  Java 
-    && eval "${aptInstall} apt-utils software-properties-common ${nullEnd}" \
-    && eval "add-apt-repository ppa:openjdk-r/ppa -y ${nullEnd}" \
-    && eval "${aptUpdate}" \
-    && eval "${aptInstall} openjdk-8-jdk ${nullEnd}" \
+# SDKMAN 
+    && eval "${aptInstall} curl wget unzip zip ca-certificates ${nullEnd}" \
+    && curl -s "https://get.sdkman.io" | bash \
+    && source "$HOME/.sdkman/bin/sdkman-init.sh" \
+    && sdk version \
+# ------------------------------------------------------
+# JAVA
+    && sdk install java $(sdk ls java | grep "\-open" | grep -v "\.ea\." | sed -e 's/^.*| \([^-]*\)-.*$/\1/' | grep "^8" | head -1)-open \
+    && eval "echo \"JAVA_HOME=${JAVA_HOME}\"" \
     && java -version \
-# Finish Java
 # ------------------------------------------------------
-# Start  Android
-	&& eval "${aptInstall} ant curl libc6:i386 libgcc1:i386 libncurses5:i386 libstdc++6:i386 libz1:i386 net-tools zlib1g:i386 wget unzip ${nullEnd}" \
+# ANT
+    && sdk install ant \
+    && ant -version \
+# ------------------------------------------------------
+# MAVEN
+    && sdk install maven \
+    && mvn -version \
+# ------------------------------------------------------
+# GRADLE
+    && sdk install gradle \
+    && gradle --version \
+# ------------------------------------------------------
+# ANDROID
+	&& eval "${aptInstall} curl libc6:i386 libgcc1:i386 libncurses5:i386 libstdc++6:i386 libz1:i386 net-tools zlib1g:i386 wget unzip ${nullEnd}" \
 	&& mkdir -p /opt \
 	&& wget -q "${ANDROID_SDK_URL}" -O android-sdk-tools.zip \
 	&& eval "unzip -q android-sdk-tools.zip -d ${ANDROID_HOME} ${nullEnd}" \
@@ -76,38 +99,7 @@ RUN set -x \
 	&& eval "(yes | sdkmanager --update --channel=3)  ${nullEnd}" \
 	&& yes | sdkmanager \
         "platforms;android-29" \
-        #"platforms;android-28" \
-        #"platforms;android-27" \
-        #"platforms;android-26" \
-        #"platforms;android-25" \
-        #"platforms;android-24" \
-        #"platforms;android-23" \
-        #"platforms;android-22" \
-        #"platforms;android-21" \
-        #"platforms;android-19" \
-        #"platforms;android-17" \
-        #"platforms;android-15" \
         "build-tools;29.0.3" \
-        #"build-tools;29.0.2" \
-        #"build-tools;29.0.1" \
-        #"build-tools;29.0.0" \
-        #"build-tools;28.0.3" \
-        #"build-tools;28.0.2" \
-        #"build-tools;28.0.1" \
-        #"build-tools;28.0.0" \
-        #"build-tools;27.0.3" \
-        #"build-tools;27.0.2" \
-        #"build-tools;27.0.1" \
-        #"build-tools;27.0.0" \
-        #"build-tools;26.0.2" \
-        #"build-tools;26.0.1" \
-        #"build-tools;25.0.3" \
-        #"build-tools;24.0.3" \
-        #"build-tools;23.0.3" \
-        #"build-tools;22.0.1" \
-        #"build-tools;21.1.2" \
-        #"build-tools;19.1.0" \
-        #"build-tools;17.0.0" \
         #"system-images;android-29;google_apis;x86" \
         #"system-images;android-28;google_apis;x86" \
         #"system-images;android-26;google_apis;x86" \
@@ -115,8 +107,8 @@ RUN set -x \
         #"system-images;android-24;default;armeabi-v7a" \
         #"system-images;android-22;default;armeabi-v7a" \
         #"system-images;android-19;default;armeabi-v7a" \
-        #"extras;android;m2repository" \
-        #"extras;google;m2repository" \
+        "extras;android;m2repository" \
+        "extras;google;m2repository" \
         #"extras;google;google_play_services" \
         #"extras;m2repository;com;android;support;constraint;constraint-layout;1.0.2" \
         #"extras;m2repository;com;android;support;constraint;constraint-layout;1.0.1" \
@@ -125,36 +117,27 @@ RUN set -x \
         #"add-ons;addon-google_apis-google-21" \
         >/dev/null 2>&1 \
 # ------------------------------------------------------
-# Gradle 
-		&& eval "${aptInstall} gradle ${nullEnd}" \
-		&& gradle --version \
+# NODEJS
+    && eval "${aptInstall} curl git ca-certificates ${nullEnd}" \
+    && mkdir -p /opt/node \
+    && (cd /opt/node \
+        && curl -sSL https://nodejs.org/dist/latest/ | grep "node-" | head -1 | sed -e 's/^[^-]*-\([^-]*\)-.*/\1/' > /tmp/nodejsVersion \
+        && curl -sSL https://nodejs.org/dist/$(cat /tmp/nodejsVersion)/node-$(cat /tmp/nodejsVersion)-linux-x64.tar.gz | tar xz --strip-components=1) \
+        && node --version \
+        && npm --version \
 # ------------------------------------------------------
-#Maven
-	    && eval "${aptPurge} maven maven2" \
-	    && eval "${aptInstall} maven ${nullEnd}" \
-	    && mvn --version \
-# Finish Android
+# CORDOVA IONIC FRAMEWORK7
+    && (cd /tmp \
+        && npm i -g --unsafe-perm "cordova@${CORDOVA_VERSION}" "@ionic/cli@${IONIC_VERSION}" "framework7-cli@${FRAMEWORK_SEVEN_VERSION}") \
+        && cordova --version \
+        && cordova telemetry off \
+        && ionic --version \
+        && framework7 --version \
 # ------------------------------------------------------
-# Start  NodeJS
-	    && eval "${aptInstall} curl git ca-certificates ${nullEnd}" \
-	    && mkdir -p /opt/node \
-	    && (cd /opt/node \
-	        && curl -sSL https://nodejs.org/dist/latest/ | grep "node-" | head -1 | sed -e 's/^[^-]*-\([^-]*\)-.*/\1/' > /tmp/nodejsVersion \
-	        && curl -sSL https://nodejs.org/dist/$(cat /tmp/nodejsVersion)/node-$(cat /tmp/nodejsVersion)-linux-x64.tar.gz | tar xz --strip-components=1) \
-	        && node --version \
-	        && npm --version \
-# Finish NodeJS
+# CLEAN-UP
+    && eval "${aptAutoremove}" \
+    && eval "${aptClean}" \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
 # ------------------------------------------------------
-# Start Cordova Ionic Framework7
-	    && (cd /tmp \
-	        && npm i -g --unsafe-perm "cordova@${CORDOVA_VERSION}" "@ionic/cli@${IONIC_VERSION}" "framework7-cli@${FRAMEWORK_SEVEN_VERSION}") \
-	        && cordova --version \
-	        && cordova telemetry off \
-	        && ionic --version \
-	        && framework7 --version \
-# Finish Cordova
-# ------------------------------------------------------
-# Clean up
-	    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
-	    && eval "${aptAutoremove}" \
-	    && eval "${aptClean}" 
+# LAST LINE ...
+    && true	    
