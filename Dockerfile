@@ -20,7 +20,7 @@ LABEL maintainer="Luca Guzzon <luca.guzzon@gmail.com>" \
     org.label-schema.description="[Ubuntu -> Java -> Android -> NodeJS -> Cordova] Docker image" \
     org.label-schema.url="https://github.com/lguzzon-DOCKER/docker-cordova"
 
-# Start  Base 
+# Start  Base
 ENV DEBIAN_FRONTEND noninteractive
 ENV uAptGet "apt-get -y -qq -o Dpkg::Options::=--force-all"
 ENV uApt "${uAptGet}"
@@ -57,14 +57,14 @@ ENV FRAMEWORK_SEVEN_VERSION latest
 # # /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
 
 # ------------------------------------------------------
-# PRE-REQUISITES 
+# PRE-REQUISITES
 RUN    rm /bin/sh && ln -s /bin/bash /bin/sh
 # RUN    set -x \
 RUN    true \
     && eval "dpkg --add-architecture i386 ${nullEnd}" \
     && eval "${aptUpdate}" \
 # ------------------------------------------------------
-# SDKMAN 
+# SDKMAN
     && eval "${aptInstall} curl wget unzip zip ca-certificates ${nullEnd}" \
     && curl -s "https://get.sdkman.io" | bash \
     && source "$HOME/.sdkman/bin/sdkman-init.sh" \
@@ -88,34 +88,34 @@ RUN    true \
     && gradle --version \
 # ------------------------------------------------------
 # ANDROID
-	&& eval "${aptInstall} curl libc6:i386 libgcc1:i386 libncurses5:i386 libstdc++6:i386 libz1:i386 net-tools zlib1g:i386 wget unzip ${nullEnd}" \
-	&& mkdir -p /opt \
-	&& wget -q "${ANDROID_SDK_URL}" -O android-sdk-tools.zip \
-	&& eval "unzip -q android-sdk-tools.zip -d ${ANDROID_HOME} ${nullEnd}" \
-	&& rm android-sdk-tools.zip \
-	&& eval "(yes | sdkmanager --licenses) ${nullEnd}" \
-	&& touch /root/.android/repositories.cfg \
-	&& eval "sdkmanager emulator tools platform-tools ${nullEnd}" \
-	&& eval "(yes | sdkmanager --update --channel=3)  ${nullEnd}" \
-	&& yes | sdkmanager \
-        "platforms;android-29" \
-        "build-tools;29.0.3" \
-        #"system-images;android-29;google_apis;x86" \
-        #"system-images;android-28;google_apis;x86" \
-        #"system-images;android-26;google_apis;x86" \
-        #"system-images;android-25;google_apis;armeabi-v7a" \
-        #"system-images;android-24;default;armeabi-v7a" \
-        #"system-images;android-22;default;armeabi-v7a" \
-        #"system-images;android-19;default;armeabi-v7a" \
-        "extras;android;m2repository" \
-        "extras;google;m2repository" \
-        #"extras;google;google_play_services" \
-        #"extras;m2repository;com;android;support;constraint;constraint-layout;1.0.2" \
-        #"extras;m2repository;com;android;support;constraint;constraint-layout;1.0.1" \
-        #"add-ons;addon-google_apis-google-23" \
-        #"add-ons;addon-google_apis-google-22" \
-        #"add-ons;addon-google_apis-google-21" \
-        >/dev/null 2>&1 \
+    && eval "${aptInstall} curl libc6:i386 libgcc1:i386 libncurses5:i386 libstdc++6:i386 libz1:i386 net-tools zlib1g:i386 wget unzip ${nullEnd}" \
+    && mkdir -p /opt \
+    && wget -q "${ANDROID_SDK_URL}" -O android-sdk-tools.zip \
+    && eval "unzip -q android-sdk-tools.zip -d ${ANDROID_HOME} ${nullEnd}" \
+    && rm android-sdk-tools.zip \
+    && eval "(yes | sdkmanager --licenses) ${nullEnd}" \
+    && touch /root/.android/repositories.cfg \
+    && eval "sdkmanager emulator tools platform-tools ${nullEnd}" \
+    && eval "(yes | sdkmanager --update --channel=3)  ${nullEnd}" \
+    && yes | sdkmanager \
+    "platforms;android-29" \
+    "build-tools;29.0.3" \
+    #"system-images;android-29;google_apis;x86" \
+    #"system-images;android-28;google_apis;x86" \
+    #"system-images;android-26;google_apis;x86" \
+    #"system-images;android-25;google_apis;armeabi-v7a" \
+    #"system-images;android-24;default;armeabi-v7a" \
+    #"system-images;android-22;default;armeabi-v7a" \
+    #"system-images;android-19;default;armeabi-v7a" \
+    "extras;android;m2repository" \
+    "extras;google;m2repository" \
+    #"extras;google;google_play_services" \
+    #"extras;m2repository;com;android;support;constraint;constraint-layout;1.0.2" \
+    #"extras;m2repository;com;android;support;constraint;constraint-layout;1.0.1" \
+    #"add-ons;addon-google_apis-google-23" \
+    #"add-ons;addon-google_apis-google-22" \
+    #"add-ons;addon-google_apis-google-21" \
+    >/dev/null 2>&1 \
 # ------------------------------------------------------
 # NODEJS
     && eval "${aptInstall} curl git ca-certificates ${nullEnd}" \
@@ -123,16 +123,16 @@ RUN    true \
     && (cd /opt/node \
         && curl -sSL https://nodejs.org/dist/latest/ | grep "node-" | head -1 | sed -e 's/^[^-]*-\([^-]*\)-.*/\1/' > /tmp/nodejsVersion \
         && curl -sSL https://nodejs.org/dist/$(cat /tmp/nodejsVersion)/node-$(cat /tmp/nodejsVersion)-linux-x64.tar.gz | tar xz --strip-components=1) \
-        && node --version \
-        && npm --version \
+    && node --version \
+    && npm --version \
 # ------------------------------------------------------
 # CORDOVA IONIC FRAMEWORK7
     && (cd /tmp \
         && npm i -g --unsafe-perm "cordova@${CORDOVA_VERSION}" "@ionic/cli@${IONIC_VERSION}" "framework7-cli@${FRAMEWORK_SEVEN_VERSION}") \
-        && cordova --version \
-        && cordova telemetry off \
-        && ionic --version \
-        && framework7 --version \
+    && cordova --version \
+    && cordova telemetry off \
+    && ionic --version \
+    && framework7 --version \
 # ------------------------------------------------------
 # CLEAN-UP
     && eval "${aptAutoremove}" \
@@ -140,4 +140,4 @@ RUN    true \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
 # ------------------------------------------------------
 # LAST LINE ...
-    && true	    
+    && true
