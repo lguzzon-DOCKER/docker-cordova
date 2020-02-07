@@ -4,5 +4,5 @@ services:
   - docker
 
 script:
-  - docker build -t letsTest .
-  - docker run letsTest /bin/sh -c 'source "$HOME/.sdkman/bin/sdkman-init.sh" && (cordova create test && cd test && cordova platform add android && cordova build android)'
+  - docker build -t lets-test-me .
+  - docker run lets-test-me /bin/sh -c 'source "$HOME/.sdkman/bin/sdkman-init.sh" && (cordova create test && cd test && cordova platform add android && cordova build android)'
