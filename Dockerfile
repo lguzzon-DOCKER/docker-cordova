@@ -128,7 +128,7 @@ RUN    true \
 # ------------------------------------------------------
 # CORDOVA IONIC FRAMEWORK7
     && (cd /tmp \
-        && npm i -g --unsafe-perm "cordova@${CORDOVA_VERSION}" "@ionic/cli@${IONIC_VERSION}" "framework7-cli@${FRAMEWORK_SEVEN_VERSION}") \
+        && npm i -g --unsafe-perm=true --allow-root "cordova@${CORDOVA_VERSION}" "@ionic/cli@${IONIC_VERSION}" "framework7-cli@${FRAMEWORK_SEVEN_VERSION}") \
     && cordova --version \
     && cordova telemetry off \
     && ionic --version \
