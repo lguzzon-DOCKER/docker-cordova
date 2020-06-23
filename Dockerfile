@@ -45,6 +45,7 @@ ENV PATH $PATH:/opt/node/bin
 
 # Start Cordova
 ENV CORDOVA_VERSION latest
+ENV PHONEGAP_VERSION latest
 ENV IONIC_VERSION latest
 ENV FRAMEWORK_SEVEN_VERSION latest
 # Finish Cordova
@@ -88,7 +89,7 @@ RUN    true \
     && gradle --version \
 # ------------------------------------------------------
 # ANDROID
-    && eval "${aptInstall} curl libc6:i386 libgcc1:i386 libncurses5:i386 libstdc++6:i386 libz1:i386 net-tools zlib1g:i386 wget unzip ${nullEnd}" \
+    && eval "${aptInstall} curl libc6:i386 libgcc1:i386 libncurses5:i386 libstdc++6:i386 libz1:i386 net-tools zlib1g:i386 wget unzip zipalign ${nullEnd}" \
     && mkdir -p /opt \
     && wget -q "${ANDROID_SDK_URL}" -O android-sdk-tools.zip \
     && eval "unzip -q android-sdk-tools.zip -d ${ANDROID_HOME} ${nullEnd}" \
@@ -99,6 +100,7 @@ RUN    true \
     && eval "(yes | sdkmanager --update --channel=3)  ${nullEnd}" \
     && yes | sdkmanager \
     "platforms;android-29" \
+    "platforms;android-28" \
     "build-tools;29.0.3" \
     #"system-images;android-29;google_apis;x86" \
     #"system-images;android-28;google_apis;x86" \
@@ -126,13 +128,16 @@ RUN    true \
     && node --version \
     && npm --version \
 # ------------------------------------------------------
-# CORDOVA IONIC FRAMEWORK7
+# CORDOVA PHONEGAP IONIC FRAMEWORK7 cordova-check-plugins
     && (cd /tmp \
-        && npm i -g --unsafe-perm=true --allow-root "cordova@${CORDOVA_VERSION}" "@ionic/cli@${IONIC_VERSION}" "framework7-cli@${FRAMEWORK_SEVEN_VERSION}") \
+        && npm i -g --unsafe-perm=true --allow-root "cordova@${CORDOVA_VERSION}" "phonegap@${PHONEGAP_VERSION}" "@ionic/cli@${IONIC_VERSION}" "framework7-cli@${FRAMEWORK_SEVEN_VERSION}" "cordova-check-plugins") \
     && cordova --version \
     && cordova telemetry off \
+    && phonegap --version \
+    && phonegap analytics off \
     && ionic --version \
     && framework7 --version \
+    && cordova-check-plugins --version \
 # ------------------------------------------------------
 # CLEAN-UP
     && eval "${aptAutoremove}" \
