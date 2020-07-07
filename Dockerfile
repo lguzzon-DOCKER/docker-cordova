@@ -123,7 +123,7 @@ RUN    true \
     && eval "${aptInstall} curl git ca-certificates ${nullEnd}" \
     && mkdir -p /opt/node \
     && (cd /opt/node \
-        && curl -sSL https://nodejs.org/dist/latest/ | grep "node-" | head -1 | sed -e 's/^[^-]*-\([^-]*\)-.*/\1/' > /tmp/nodejsVersion \
+        && curl -sSL https://nodejs.org/dist/latest-erbium/ | grep "node-v" | head -1 | sed -e 's/^[^-]*-\([^-]*\)-.*/\1/' > /tmp/nodejsVersion \
         && curl -sSL https://nodejs.org/dist/$(cat /tmp/nodejsVersion)/node-$(cat /tmp/nodejsVersion)-linux-x64.tar.gz | tar xz --strip-components=1) \
     && node --version \
     && npm --version \
