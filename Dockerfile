@@ -48,6 +48,9 @@ ENV CORDOVA_VERSION latest
 ENV PHONEGAP_VERSION latest
 ENV IONIC_VERSION latest
 ENV FRAMEWORK_SEVEN_VERSION latest
+ENV TABRIS_VERSION latest
+ENV YARN_VERSION latest
+ENV PNPM_VERSION latest
 # Finish Cordova
 
 # Use this to truncate long RUN s
@@ -71,6 +74,25 @@ RUN    true \
     && source "$HOME/.sdkman/bin/sdkman-init.sh" \
     && sdk version \
 # ------------------------------------------------------
+# NODEJS
+    && eval "${aptInstall} curl git ca-certificates ${nullEnd}" \
+    && mkdir -p /opt/node \
+    && (cd /opt/node \
+        && curl -sSL https://nodejs.org/dist/latest-erbium/ | grep "node-v" | head -1 | sed -e 's/^[^-]*-\([^-]*\)-.*/\1/' > /tmp/nodejsVersion \
+        && curl -sSL https://nodejs.org/dist/$(cat /tmp/nodejsVersion)/node-$(cat /tmp/nodejsVersion)-linux-x64.tar.gz | tar xz --strip-components=1) \
+    && echo "node version" \
+    && node --version \
+    && echo "npm version" \
+    && npm --version \
+    && pushd /tmp \
+    && npm i -g --unsafe-perm=true --allow-root "pnpm@${PNPM_VERSION}" \
+    && echo "pnpm version" \
+    && pnpm --version \
+    && npm i -g --unsafe-perm=true --allow-root "yarn@${YARN_VERSION}" \
+    && echo "yarn version" \
+    && yarn --version \
+    && popd \
+# ------------------------------------------------------
 # JAVA
     && sdk install java $(sdk ls java | grep "\-open" | grep -v "\.ea\." | sed -e 's/^.*| \([^-]*\)-.*$/\1/' | grep "^8" | head -1)-open \
     && eval "echo \"JAVA_HOME=${JAVA_HOME}\"" \
@@ -86,6 +108,8 @@ RUN    true \
 # ------------------------------------------------------
 # GRADLE
     && sdk install gradle \
+    && gradle --version \
+    && sdk install gradle 4.10.3 \
     && gradle --version \
 # ------------------------------------------------------
 # ANDROID
@@ -119,25 +143,29 @@ RUN    true \
     #"add-ons;addon-google_apis-google-21" \
     >/dev/null 2>&1 \
 # ------------------------------------------------------
-# NODEJS
-    && eval "${aptInstall} curl git ca-certificates ${nullEnd}" \
-    && mkdir -p /opt/node \
-    && (cd /opt/node \
-        && curl -sSL https://nodejs.org/dist/latest-erbium/ | grep "node-v" | head -1 | sed -e 's/^[^-]*-\([^-]*\)-.*/\1/' > /tmp/nodejsVersion \
-        && curl -sSL https://nodejs.org/dist/$(cat /tmp/nodejsVersion)/node-$(cat /tmp/nodejsVersion)-linux-x64.tar.gz | tar xz --strip-components=1) \
-    && node --version \
-    && npm --version \
-# ------------------------------------------------------
 # CORDOVA PHONEGAP IONIC FRAMEWORK7 cordova-check-plugins
-    && (cd /tmp \
-        && npm i -g --unsafe-perm=true --allow-root "cordova@${CORDOVA_VERSION}" "phonegap@${PHONEGAP_VERSION}" "@ionic/cli@${IONIC_VERSION}" "framework7-cli@${FRAMEWORK_SEVEN_VERSION}" "cordova-check-plugins") \
+    && pushd /tmp \
+    && pnpm i -g --unsafe-perm=true "cordova@${CORDOVA_VERSION}" \
+    && echo "Cordova version" \
     && cordova --version \
     && cordova telemetry off \
+    && pnpm i -g --unsafe-perm=true "phonegap@${PHONEGAP_VERSION}" \
+    && echo "Phonegap version" \
     && phonegap --version \
     && phonegap analytics off \
+    && pnpm i -g --unsafe-perm=true "@ionic/cli@${IONIC_VERSION}" \
+    && echo "Ionic version" \
     && ionic --version \
+    && pnpm i -g --unsafe-perm=true "framework7-cli@${FRAMEWORK_SEVEN_VERSION}" \
+    && echo "Framework7 version" \
     && framework7 --version \
+    && pnpm i -g --unsafe-perm=true "tabris-cli@${TABRIS_VERSION}" \
+    && echo "Tabris version" \
+    && tabris --version \
+    && pnpm i -g --unsafe-perm=true "cordova-check-plugins" \
+    && echo "cordova-check-plugins version" \
     && cordova-check-plugins --version \
+    && popd \
 # ------------------------------------------------------
 # CLEAN-UP
     && eval "${aptAutoremove}" \
