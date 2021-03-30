@@ -35,22 +35,22 @@ ENV TERM xterm
 
 # Start  Android
 ENV ANDROID_HOME "/opt/android"
+ENV ANDROID_SDK_ROOT "/opt/android"
 ENV ANDROID_SDK_URL "https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip"
 ENV PATH ${PATH}:${ANDROID_HOME}/tools:${ANDROID_HOME}/tools/bin:${ANDROID_HOME}/platform-tools
 # Finish Android
 
 # Start  NodeJS
 ENV PATH $PATH:/opt/node/bin
+ENV PNPM_VERSION latest
+ENV YARN_VERSION latest
 # Finish NodeJS
 
 # Start Cordova
 ENV CORDOVA_VERSION latest
-ENV PHONEGAP_VERSION latest
-ENV IONIC_VERSION latest
 ENV FRAMEWORK_SEVEN_VERSION latest
+ENV IONIC_VERSION latest
 ENV TABRIS_VERSION latest
-ENV YARN_VERSION latest
-ENV PNPM_VERSION latest
 # Finish Cordova
 
 # Use this to truncate long RUN s
@@ -143,28 +143,41 @@ RUN    true \
     #"add-ons;addon-google_apis-google-21" \
     >/dev/null 2>&1 \
 # ------------------------------------------------------
-# CORDOVA PHONEGAP IONIC FRAMEWORK7 cordova-check-plugins
+# CORDOVA stuffs start
     && pushd /tmp \
-    && pnpm i -g --unsafe-perm=true "cordova@${CORDOVA_VERSION}" \
+# ------------------------------------------------------
+# CORDOVA 
+    && npm i -g --unsafe-perm=true "cordova@${CORDOVA_VERSION}" \
     && echo "Cordova version" \
-    && cordova --version \
     && cordova telemetry off \
-    && pnpm i -g --unsafe-perm=true "phonegap@${PHONEGAP_VERSION}" \
-    && echo "Phonegap version" \
-    && phonegap --version \
-    && phonegap analytics off \
-    && pnpm i -g --unsafe-perm=true "@ionic/cli@${IONIC_VERSION}" \
-    && echo "Ionic version" \
-    && ionic --version \
-    && pnpm i -g --unsafe-perm=true "framework7-cli@${FRAMEWORK_SEVEN_VERSION}" \
+    && cordova --version \
+# ------------------------------------------------------
+# FRAMEWORK7 
+    && npm i -g --unsafe-perm=true "framework7-cli@${FRAMEWORK_SEVEN_VERSION}" \
     && echo "Framework7 version" \
     && framework7 --version \
-    && pnpm i -g --unsafe-perm=true "tabris-cli@${TABRIS_VERSION}" \
+# ------------------------------------------------------
+# IONIC 
+    && npm i -g --unsafe-perm=true "@ionic/cli@${IONIC_VERSION}" \
+    && echo "Ionic version" \
+    && ionic --version \
+# ------------------------------------------------------
+# TABRIS 
+    && npm i -g --unsafe-perm=true "tabris-cli@${TABRIS_VERSION}" \
     && echo "Tabris version" \
     && tabris --version \
-    && pnpm i -g --unsafe-perm=true "cordova-check-plugins" \
+# ------------------------------------------------------
+# CORDOVA-CHECK-PLUGINS 
+    && npm i -g --unsafe-perm=true "cordova-check-plugins" \
     && echo "cordova-check-plugins version" \
     && cordova-check-plugins --version \
+# ------------------------------------------------------
+# CORDOVA-RES
+    && npm i -g --unsafe-perm=true "cordova-res" \
+    && echo "cordova-res version" \
+    && cordova-check-plugins --version \
+# ------------------------------------------------------
+# CORDOVA stuffs finish 
     && popd \
 # ------------------------------------------------------
 # CLEAN-UP
